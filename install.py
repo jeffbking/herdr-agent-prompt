@@ -17,7 +17,7 @@ PLUGIN_COMMAND = "herdr-agent-prompt.open"
 DEFAULT_KEY = "prefix+p"
 
 
-def install(key: str = DEFAULT_KEY, herdr_bin: str = "herdr", dry_run: bool = False):
+def install(key: str = DEFAULT_KEY, herdr_bin: str = "herdr", dry_run: bool = False, link: bool = True):
     root = Path(__file__).resolve().parent
     herdr = os.environ.get("HERDR_BIN_PATH", herdr_bin)
     config_path = Path(os.environ.get("HERDR_CONFIG_PATH", Path.home() / ".config/herdr/config.toml"))
@@ -44,13 +44,15 @@ def install(key: str = DEFAULT_KEY, herdr_bin: str = "herdr", dry_run: bool = Fa
     tomllib.loads(updated)
 
     if dry_run:
-        print("[Dry Run] Would link plugin at:", root)
+        if link:
+            print("[Dry Run] Would link plugin at:", root)
         print(f"[Dry Run] Would configure keybinding '{active_key}' in: {config_path}")
         return
 
-    # Link plugin into Herdr
-    print(f"Linking plugin in Herdr: {herdr} plugin link {root} --enabled")
-    subprocess.run([herdr, "plugin", "link", str(root), "--enabled"], check=True)
+    # Link plugin into Herdr (skipped for marketplace installs, which are already registered)
+    if link:
+        print(f"Linking plugin in Herdr: {herdr} plugin link {root} --enabled")
+        subprocess.run([herdr, "plugin", "link", str(root), "--enabled"], check=True)
 
     # Update config.toml if needed
     if updated != original:
@@ -89,9 +91,14 @@ def main():
     parser.add_argument("--key", default=os.environ.get("HERDR_PROMPT_KEY", DEFAULT_KEY), help="Shortcut key to bind (default: prefix+p)")
     parser.add_argument("--herdr", default=os.environ.get("HERDR_BIN_PATH", "herdr"), help="Path to herdr executable")
     parser.add_argument("--dry-run", action="store_true", help="Preview actions without writing")
+    parser.add_argument(
+        "--no-link",
+        action="store_true",
+        help="Only configure the shortcut; skip 'herdr plugin link' (use after 'herdr plugin install')",
+    )
     args = parser.parse_args()
 
-    install(key=args.key, herdr_bin=args.herdr, dry_run=args.dry_run)
+    install(key=args.key, herdr_bin=args.herdr, dry_run=args.dry_run, link=not args.no_link)
 
 
 if __name__ == "__main__":
