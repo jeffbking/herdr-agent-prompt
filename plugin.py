@@ -22,6 +22,11 @@ ENTRYPOINT = "viewer"
 
 def resolve_target_pane_id() -> Optional[str]:
     """Resolve target pane ID from environment context or Herdr query."""
+    # Explicit target pane passed to the overlay entrypoint via --env
+    explicit_target = os.environ.get("HERDR_PROMPT_TARGET_PANE_ID")
+    if explicit_target:
+        return explicit_target
+
     context_str = os.environ.get("HERDR_PLUGIN_CONTEXT_JSON")
     if context_str:
         try:
@@ -32,7 +37,7 @@ def resolve_target_pane_id() -> Optional[str]:
         except Exception:
             pass
 
-    env_target = os.environ.get("HERDR_PROMPT_TARGET_PANE_ID") or os.environ.get("HERDR_PANE_ID")
+    env_target = os.environ.get("HERDR_PANE_ID")
     if env_target:
         return env_target
 
