@@ -13,12 +13,49 @@ Supports **Antigravity (agy)**, **Claude Code**, **Pi**, and **Codex**, plus fal
 - **Cross-Pane Diagnostics:** If triggered on a pane without an agent (e.g. a plain shell), displays a list of all live agents across other panes, allowing you to select and inspect any agent.
 - **CLI & Scripting Support:** Run `plugin.py list` or `plugin.py get [pane]` directly from the shell or terminal scripts.
 
+## Requirements
+
+- Herdr 0.7.0 or newer on Linux or macOS.
+- Python 3 on `PATH` as `python3` (3.11+ for `install.py`, which uses the standard-library `tomllib`). The plugin has no third-party dependencies.
+- Optional clipboard helpers for terminals without OSC 52: `wl-copy`, `xclip`, or `pbcopy`.
+
 ## Installation
 
-Run the included installer:
+### From the Herdr marketplace
 
 ```bash
-cd ~/Developer/herdr-agent-prompt
+herdr plugin install jeffbking/herdr-agent-prompt
+```
+
+Then bind the action to a shortcut in `~/.config/herdr/config.toml`:
+
+```toml
+[[keys.command]]
+key = "prefix+p"
+type = "plugin_action"
+command = "herdr-agent-prompt.open"
+description = "show agent original prompt"
+```
+
+Reload the running server so the binding takes effect:
+
+```bash
+herdr server reload-config
+```
+
+Or let the installer add the binding for you (it backs up `config.toml` first and skips the link step since the plugin is already installed):
+
+```bash
+python3 ~/.config/herdr/plugins/github/herdr-agent-prompt-*/install.py --no-link
+```
+
+To pin a release: `herdr plugin install jeffbking/herdr-agent-prompt --ref v0.1.0`.
+
+### From a local checkout (development)
+
+```bash
+git clone https://github.com/jeffbking/herdr-agent-prompt.git
+cd herdr-agent-prompt
 python3 install.py
 ```
 
@@ -35,6 +72,8 @@ To bind a different shortcut (for example `prefix+P`):
 ```bash
 python3 install.py --key "prefix+P"
 ```
+
+If `prefix+p` is already bound to another command, the installer refuses and tells you which command holds it; pick another key with `--key`.
 
 ## Keybindings (Inside the Overlay)
 
