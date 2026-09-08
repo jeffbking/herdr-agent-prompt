@@ -1,0 +1,18 @@
+id = "herdr-agent-prompt"
+name = "Agent Prompt Viewer"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Show the agent's original prompt in an interactive overlay on shortcut press."
+platforms = ["linux", "macos"]
+
+[[actions]]
+id = "open"
+title = "Show agent original prompt"
+contexts = ["pane", "workspace", "global"]
+command = ["python3", "plugin.py", "open"]
+
+[[panes]]
+id = "viewer"
+title = "Agent Original Prompt"
+placement = "overlay"
+command = ["python3", "plugin.py", "ui"]
